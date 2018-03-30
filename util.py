@@ -1,7 +1,7 @@
 import math
 import random
 
-from location import Location
+from models.location import Location
 
 lat_to_lat_distance = 69    # miles
 lng_to_lng_distance = 53    # miles
@@ -22,3 +22,8 @@ def random_point_in_circle(center, radius):
 def random_location_in_circle(center, radius):
     p = random_point_in_circle(center, radius)
     return Location(lat=p[0], lng=p[1])
+
+
+def fread(fname):
+    with open(fname, 'r') as fp:
+        return fp.read()

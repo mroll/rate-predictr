@@ -6,10 +6,10 @@ from datetime import datetime
 import peewee as pw
 
 import util
-from cost import Cost
-from cost_estimate import CostEstimate
-from location import Location
 from lyft_client import LyftClient
+from models.cost import Cost
+from models.cost_estimate import CostEstimate
+from models.location import Location
 
 db = pw.SqliteDatabase('lyft.db')
 db.connect()

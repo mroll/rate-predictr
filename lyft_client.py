@@ -4,12 +4,8 @@ from datetime import datetime
 
 import requests
 
-from cost import Cost
-
-
-def fread(fname):
-    with open(fname, 'r') as fp:
-        return fp.read()
+from models.cost import Cost
+from util import fread
 
 
 class LyftClient:

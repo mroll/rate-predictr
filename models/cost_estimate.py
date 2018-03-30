@@ -1,7 +1,7 @@
 import peewee as pw
 
-from cost import Cost
-from location import Location
+from models.cost import Cost
+from models.location import Location
 
 db = pw.SqliteDatabase('lyft.db')
 
