@@ -17,5 +17,45 @@ currency).
 
 ## Installing
 
-... coming soon
+This project is developed with:
+
+* [Python3.6.4](https://www.python.org/downloads/release/python-364/)
+* [virtualenv](https://virtualenv.pypa.io/en/stable/)
+
+Once those tools are installed on your system, get the code and set up the
+virtual environment like so:
+
+```
+$ git clone git@github.com:mroll/rate-predictr.git
+$ cd rate-predictr
+$ mkvirtualenv rate-predictr
+$ pip install -r requirements.txt
+```
+
+## Running
+
+Commands currently supported by the cli:
+
+### add_location
+
+```
+$ ./main.py add_location boston_common --lat=42.354706 --lng=-71.066450
+```
+
+This will add a row to the `location` database table. The row will have the name
+`boston_common` and the lat and longtide values seen above. This is a
+convencience method for adding locations to be used by the `get_costs` command.
+
+### get_costs
+
+```
+$ ./main.py get_costs --center=boston_common --radius=R N
+```
+
+This will query the Lyft API for cost estimates for `N` trips randomly selected
+in an `R` mile radius around center. The trips and the returned estimate will be
+recorded in the database.
+
+See `util.py:random_point_in_circle` for how the coordinates of the start and
+end location of the trip are generated.
 
