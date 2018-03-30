@@ -29,7 +29,7 @@ def add_location(args):
         print('Location by that name already exists')
 
 
-def get_cost(args):
+def get_costs(args):
     try:
         center = Location.get(Location.name == args.center)
     except pw.DoesNotExist:
@@ -63,14 +63,14 @@ parser = argparse.ArgumentParser(description='Lyft API interface')
 subparsers = parser.add_subparsers(help='sub-command help')
 
 
-cost_parser = subparsers.add_parser('get_cost', help='get ride cost estimates')
+cost_parser = subparsers.add_parser('get_costs', help='get ride cost estimates')
 cost_parser.add_argument('--center', dest='center', type=str,
                          help='center of the circle to search')
 cost_parser.add_argument('--radius', dest='radius', type=float,
                          help='radius to search within around the center')
 cost_parser.add_argument('samples', type=int,
                          help='number of trips for which to request estimated cost')
-cost_parser.set_defaults(func=get_cost)
+cost_parser.set_defaults(func=get_costs)
 
 location_parser = subparsers.add_parser('add_location', help='add a location to the db')
 location_parser.add_argument('--lat', dest='lat',
