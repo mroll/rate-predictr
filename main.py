@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 import argparse
 from datetime import datetime
 
@@ -16,9 +18,7 @@ db.connect()
 
 db.create_tables([Cost, Location, CostEstimate])
 
-# TODO: Get these creds from env variables or something
-client_id = "7lvg-EnyL7sI"
-client_secret = "lzCo20mKvk1doYd58-J9QYlh6vHxzyiv"
+client_id, client_secret = util.load_credentials()
 lyft = LyftClient(client_id, client_secret)
 
 
