@@ -8,6 +8,10 @@ lyft.db
 
 .DS_Store
 
+## virtualenv stuff
+bin/
+include/
+pip-selfcheck.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
