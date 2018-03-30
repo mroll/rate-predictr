@@ -59,3 +59,32 @@ recorded in the database.
 See `util.py:random_point_in_circle` for how the coordinates of the start and
 end location of the trip are generated.
 
+## Algorithms
+
+### Trip Generation
+
+The program needs to generate start and end locations to send to Lyft for cost
+estimates. The start and end locations are parsed by the lyft api as (lat,lng)
+pairs, so our algorithm should generate (lat,lng) pairs.
+
+To generate a batch of coordinate pairs, we can draw from a set of points in
+some bounded area, using a probability distribution. Right now the code uses a
+circular area around a given center, and a uniform distribution. In the future,
+more complicated polygons and distributions could be used, to reflect actual
+Lyft usage.
+
+## Cost Estimation
+
+Given a start location, and end location, and a time, how do you find the most
+likely cost and duration of a ride?
+
+Since the (lat,lng) pairs are real numbers that go out to several decimal
+places, we cannot rely on having exact matches in the database for a given trip.
+An approximation must be good enough.
+
+One idea is to look for trips with a start location within some distance X of
+the given start location, and an end location within that same distance X of the
+given end location. Then take the average cost of those trips. Maybe there are
+other parameters to use for filtering, like time of the year, weather, time of
+day, etc., that can be used to make the approximation more accurate.
+
