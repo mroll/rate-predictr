@@ -2,6 +2,7 @@ import math
 import random
 import os
 import sys
+import textwrap
 
 from location import Location
 
@@ -30,10 +31,13 @@ def load_credentials():
     client_secret = os.environ.get('LYFT_CLIENT_SECRET')
 
     if client_id == None or client_secret == None:
-        error_message = "\nError loading Lyft Credentials.\n" + \
-            "Set credentials as environment variables:\n" + \
-            "   LYFT_CLIENT_ID\n" + "   LYFT_CLIENT_SECRET\n" + \
-            "or consider adding to your shell profile script.\n"
+        error_message = textwrap.dedent("""
+            Error loading Lyft Credentials.
+            Set credentials as environment variables:
+                LYFT_CLIENT_ID
+                LYFT_CLIENT_SECRET
+            or consider adding to your shell profile script.
+            """)
         print(error_message)
         sys.exit(1)
     else:
