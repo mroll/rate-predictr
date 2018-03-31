@@ -78,5 +78,5 @@ def estimate_trip(args):
     except pw.DoesNotExist:
         print("Start or End Location is not known.")
         return
-    print(util.similar_trips(start, end, args.radius))
+    print(similar_trips(start, end, args.radius))
 
