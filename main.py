@@ -80,6 +80,12 @@ location_parser.add_argument('--lng', dest='lng',
 location_parser.add_argument('name', help='name of the location')
 location_parser.set_defaults(func=add_location)
 
+estimate_parser = subparsers.add_parser('estimate_trip', help='estimate future trip')
+estimate_parser.add_argument('start', help='start location')
+estimate_parser.add_argument('end', help='end location')
+estimate_parser.add_argument('--radius', dest='radius', help='radius in which to consider close to start and end locations')
+estimate_parser.set_defaults(func=estimate_trip)
+
 args = parser.parse_args()
 
 args.func(args)
