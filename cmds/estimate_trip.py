@@ -1,5 +1,4 @@
 import math
-import random
 
 from models.location import Location
 from models.cost import Cost
@@ -12,30 +11,11 @@ miles_to_lat = 1 / lat_to_lat_distance
 miles_to_lng = 1 / lng_to_lng_distance
 
 
-def random_point_in_circle(center, radius):
-    theta = random.random()*2*math.pi
-    r = random.random()*radius
-
-    px, py = (r*math.cos(theta), r*math.sin(theta))
-
-    return (center.lat + px * miles_to_lat, center.lng + py * miles_to_lng)
-
-
-def random_location_in_circle(center, radius):
-    p = random_point_in_circle(center, radius)
-    return Location(lat=p[0], lng=p[1])
-
-
-def fread(fname):
-    with open(fname, 'r') as fp:
-        return fp.read()
-
-
 def point_in_circle(point, center, radius):
     dx = (center.lat - point.lat) / miles_to_lat
     dy = (center.lng - point.lng) / miles_to_lng
 
-    return math.sqrt(math.pow(dx,2) + math.pow(dy,2)) < radius
+    return hypotenuse(dx, dy) < radius
 
 
 def distance(p1, p2):
@@ -50,7 +30,13 @@ def hypotenuse(x, y):
 
 def similar_trips(start, end, radius, n=0):
     estimates = (CostEstimate
-            .select()
+            .select(CostEstimate, Location)
+            .join(
+                Location, on=(CostEstimate.start_location == Location)
+            )
+            .join(
+                Location, on=(CostEstimate.end_location == Location)
+            )
             .where(
                 point_in_circle(
                     CostEstimate.start_location,
