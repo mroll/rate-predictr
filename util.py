@@ -1,5 +1,8 @@
 import math
+import os
 import random
+import sys
+import textwrap
 
 from models.location import Location
 
@@ -27,3 +30,21 @@ def random_location_in_circle(center, radius):
 def fread(fname):
     with open(fname, 'r') as fp:
         return fp.read()
+
+
+def load_credentials():
+    client_id = os.environ.get('LYFT_CLIENT_ID')
+    client_secret = os.environ.get('LYFT_CLIENT_SECRET')
+
+    if client_id is None or client_secret is None:
+        error_message = textwrap.dedent("""
+            Error loading Lyft Credentials.
+            Set credentials as environment variables:
+                LYFT_CLIENT_ID
+                LYFT_CLIENT_SECRET
+            or consider adding to your shell profile script.
+            """)
+        print(error_message)
+        sys.exit(1)
+    else:
+        return client_id, client_secret
