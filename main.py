@@ -22,6 +22,13 @@ client_id, client_secret = util.load_credentials()
 lyft = LyftClient(client_id, client_secret)
 
 
+def trip(center, radius, trip_distance):
+    start = util.random_location_in_circle(center, radius)
+    end = util.random_location_in_circle(start, trip_distance)
+
+    return (start, end)
+
+
 def add_location(args):
     try:
         Location.create(name=args.name, lat=args.lat, lng=args.lng)
@@ -36,10 +43,12 @@ def get_costs(args):
         print('Location by the name {} is not known'.format(args.center))
         return
 
-    locations = [util.random_location_in_circle(center, args.radius)
-                 for i in range(2*args.samples)]
+    # locations = [util.random_location_in_circle(center, args.radius)
+    #              for i in range(2*args.samples)]
 
-    trips = zip(*[iter(locations)]*2)
+    # trips = zip(*[iter(locations)]*2)
+
+    trips = [trip(center, args.radius, sample(trip_distance_distribution))]
 
     for start, end in trips:
         cost_json = lyft.get_cost(
