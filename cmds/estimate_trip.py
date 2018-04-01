@@ -1,4 +1,5 @@
 import math
+import textwrap
 
 from models.location import Location
 from models.cost import Cost
@@ -29,32 +30,28 @@ def hypotenuse(x, y):
 
 
 def similar_trips(start, end, radius, n=0):
-    estimates = (CostEstimate
-            .select(CostEstimate, Location)
-            .join(
-                Location, on=(CostEstimate.start_location == Location)
-            )
-            .join(
-                Location, on=(CostEstimate.end_location == Location)
-            )
-            .where(
-                point_in_circle(
-                    CostEstimate.start_location,
+    radius = float(radius)
+    all_estimates = CostEstimate.select()
+
+    similar_estimates = []
+
+    for estimate in all_estimates:
+        if point_in_circle(
+                    estimate.start_location,
                     start,
                     radius
-                ) and
-                point_in_circle(
-                    CostEstimate.end_location,
+                ) and point_in_circle(
+                    estimate.end_location,
                     end,
                     radius
-                )
-            ))
+                ):
+            similar_estimates.append(estimate)
 
     if n == 0:
-        return estimates
+        return similar_estimates
     else:
         #return estimates.sort(key=normalize_distances)[:n]
-        return estimates[:n]
+        return similar_estimates[:n]
 
 
 def estimate_trip(args):
@@ -64,5 +61,27 @@ def estimate_trip(args):
     except pw.DoesNotExist:
         print("Start or End Location is not known.")
         return
-    print(similar_trips(start, end, args.radius))
+    
+    previous_estimates = similar_trips(start, end, args.radius)
 
+    if previous_estimates:
+        avg_cost_max = 0
+        avg_cost_min = 0
+
+        for estimate in previous_estimates:
+            avg_cost_max += estimate.cost.estimated_cost_cents_max
+            avg_cost_min += estimate.cost.estimated_cost_cents_min
+
+        avg_cost_max = (avg_cost_max / len(previous_estimates)) / 100
+        avg_cost_min = (avg_cost_min / len(previous_estimates)) / 100
+
+        print("Estimated cost of trip from {} to {}: (${}, ${})".format(
+            start.name, end.name, avg_cost_min, avg_cost_max))
+        print("Number of estimates aggregated: {}".format(
+            len(previous_estimates)))
+    else:
+        print(textwrap.dedent("""
+                No simliar trips found from {} to {}
+                with location precision of {} miles.
+            """.format(
+            start.name, end.name, args.radius)))
