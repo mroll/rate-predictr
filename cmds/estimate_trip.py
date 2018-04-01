@@ -1,5 +1,6 @@
 import math
 import textwrap
+import peewee as pw
 
 from models.location import Location
 from models.cost import Cost
@@ -24,6 +25,7 @@ def distance(p1, p2):
     dy = (p1.lng - p2.lng) / miles_to_lng
 
     return hypotenuse(dx, dy)
+
 
 def hypotenuse(x, y):
     return math.sqrt(math.pow(x,2) + math.pow(y,2))

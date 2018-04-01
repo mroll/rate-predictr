@@ -7,7 +7,7 @@ from datetime import datetime
 
 import peewee as pw
 
-from cmds.estimate_trip import estimate_trip
+from cmds import estimate_trip
 
 import util
 from lyft_client import LyftClient
