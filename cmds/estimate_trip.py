@@ -1,10 +1,17 @@
 import math
 import textwrap
 import peewee as pw
+import logging
 
 from models.location import Location
 from models.cost import Cost
 from models.cost_estimate import CostEstimate
+
+
+# Print all queries to stderr.
+logger = logging.getLogger('peewee')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
 lat_to_lat_distance = 69    # miles
 lng_to_lng_distance = 53    # miles
@@ -17,42 +24,43 @@ def point_in_circle(point, center, radius):
     dx = (center.lat - point.lat) / miles_to_lat
     dy = (center.lng - point.lng) / miles_to_lng
 
-    return hypotenuse(dx, dy) < radius
-
-
-def distance(p1, p2):
-    dx = (p1.lat - p2.lat) / miles_to_lat
-    dy = (p1.lng - p2.lng) / miles_to_lng
-
-    return hypotenuse(dx, dy)
-
-
-def hypotenuse(x, y):
-    return math.sqrt(math.pow(x,2) + math.pow(y,2))
+    return (dx * dx + dy * dy) < radius * radius
 
 
 def similar_trips(start, end, radius, n=0):
     radius = float(radius)
-    all_estimates = CostEstimate.select()
 
-    similar_estimates = []
+    SL = Location.alias()
+    EL = Location.alias()
+    CE = CostEstimate.alias()
 
-    for estimate in all_estimates:
-        if point_in_circle(
-                    estimate.start_location,
+    similar_estimates = (CE.select()
+            .join(
+                SL,
+                on=(CE.start_location == SL.id)
+            )
+            .join(
+                EL,
+                on=(CE.start_location == EL.id)
+            )
+            .switch(CE)
+            .join(Cost)
+            .switch(CE)
+            .where(
+                point_in_circle(
+                    CE.start_location,
                     start,
                     radius
-                ) and point_in_circle(
-                    estimate.end_location,
+                ) & point_in_circle(
+                    CE.end_location,
                     end,
                     radius
-                ):
-            similar_estimates.append(estimate)
+                )
+            ))
 
     if n == 0:
         return similar_estimates
     else:
-        #return estimates.sort(key=normalize_distances)[:n]
         return similar_estimates[:n]
 
 
