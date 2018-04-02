@@ -1,17 +1,11 @@
 import math
 import textwrap
 import peewee as pw
-import logging
 
 from models.location import Location
 from models.cost import Cost
 from models.cost_estimate import CostEstimate
 
-
-# Print all queries to stderr.
-logger = logging.getLogger('peewee')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
 
 lat_to_lat_distance = 69    # miles
 lng_to_lng_distance = 53    # miles
@@ -30,33 +24,25 @@ def point_in_circle(point, center, radius):
 def similar_trips(start, end, radius, n=0):
     radius = float(radius)
 
-    SL = Location.alias()
-    EL = Location.alias()
-    CE = CostEstimate.alias()
-
-    similar_estimates = (CE.select()
+    similar_start_locations = (CostEstimate.select()
             .join(
-                SL,
-                on=(CE.start_location == SL.id)
+                Location,
+                on=(CostEstimate.start_location == Location.id)
             )
-            .join(
-                EL,
-                on=(CE.start_location == EL.id)
-            )
-            .switch(CE)
-            .join(Cost)
-            .switch(CE)
+            .join(Cost, on=(CostEstimate.cost == Cost.id))
             .where(
                 point_in_circle(
-                    CE.start_location,
+                    CostEstimate.start_location,
                     start,
-                    radius
-                ) & point_in_circle(
-                    CE.end_location,
-                    end,
                     radius
                 )
             ))
+
+    similar_estimates = []
+
+    for estimate in similar_start_locations:
+        if point_in_circle(estimate.end_location, end, radius):
+            similar_estimates.append(estimate.cost)
 
     if n == 0:
         return similar_estimates
@@ -78,9 +64,9 @@ def estimate_trip(args):
         avg_cost_max = 0
         avg_cost_min = 0
 
-        for estimate in previous_estimates:
-            avg_cost_max += estimate.cost.estimated_cost_cents_max
-            avg_cost_min += estimate.cost.estimated_cost_cents_min
+        for cost in previous_estimates:
+            avg_cost_max += cost.estimated_cost_cents_max
+            avg_cost_min += cost.estimated_cost_cents_min
 
         avg_cost_max = (avg_cost_max / len(previous_estimates)) / 100
         avg_cost_min = (avg_cost_min / len(previous_estimates)) / 100
